@@ -6,8 +6,8 @@ Hawk is a cloud provider that aims for simplicity and user-friendliness.
 
 ## Developers
 
-- [@octokatherine](https://www.github.com/octokatherine)
-- [@Isakovic-Arim](https://www.github.com/ByteWolf-dev)
+- [@ByteWolf-dev](https://www.github.com/ByteWolf-dev)
+- [@Isakovic-Arim](https://www.github.com/Isakovic-Arim)
 
 
 ## Documentation

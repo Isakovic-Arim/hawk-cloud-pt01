@@ -1,18 +1,17 @@
-'use client'
+'use client';
 
 import { useSupabase } from "@/components/supabase-provider";
 import io from 'socket.io-client';
 import { User } from "@supabase/auth-helpers-nextjs";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import TerminalComponent from '@/components/Terminal';
+import Image from 'next/image';
 
 function Dashboard() {
     const { supabase } = useSupabase();
     const router = useRouter();
     const [user, setUser] = useState<User>();
-    const [servers, setServers] = useState([]);
+    const [servers, setServers] = useState<[ServerProps]>();
 
     useEffect(() => {
         getUser();
@@ -50,27 +49,37 @@ function Dashboard() {
             .then(response => response.json());
     }
 
-    return user === undefined ? <p>Loading...</p> : <div className="p-4 m-4 border-2 rounded-lg">
+    return user === undefined ? <p>Loading...</p> : <div className="p-4 m-4">
         {/* <TerminalComponent></TerminalComponent> */}
         <table className="w-full h-1/2 table-fixed">
-            <thead>
+            <thead className="p-4 border-2">
                 <tr>
-                    <th>Name</th>
-                    <th>Image</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th className="p-4">Name</th>
+                    <th className="p-4">Image</th>
+                    <th className="p-4">Status</th>
+                    <th >Action</th>
                 </tr>
             </thead>
-            <tbody>{
+            <tbody>{servers !== undefined &&
                 servers.map(server => {
-                    return <Server key={server.Id} name={server.Names[0]} image={server.Image} status={server.State} />
+                    return <Server key={server.Id} name={server.Names[0]} image={server.Image} status={server.State} State={""} Image={""} Names={undefined} Id={undefined} />
                 })
             }</tbody>
         </table>
     </div>
 }
 
-function Server({ name, image, status }) {
+type ServerProps = {
+    State: string;
+    Image: string;
+    Names: any;
+    Id: string | null | undefined;
+    name: string,
+    image: string,
+    status: string
+}
+
+const Server: React.FunctionComponent<ServerProps> = ({name, image, status}) => {
     const router = useRouter();
     const handleAction = async (name: string, action: string) => {
         await fetch(`http://localhost:2375/containers${name}/${action}`, {
@@ -93,7 +102,7 @@ function Server({ name, image, status }) {
         <td className="p-4"><div className={`w-4 h-4 m-auto ${status === 'running' ? "bg-green-500" : "bg-gray-500"} rounded-full`} /></td>
         <td><button onClick={() => handleAction(name, status === 'running' ? 'stop' : 'start')}>{status === 'running' ? 'Stop' : 'Start'}</button></td>
         {status === 'running' &&
-            <td><Image className="cursor-pointer" alt="terminal-icon" src={'/svgs/terminal.svg'} width='30' height='30' onClick={() => handleAttach(name)} /></td>}
+            <td><Image className="cursor-pointer" alt="terminal-icon" src={'/svgs/navigation/terminal.svg'} width='30' height='30' onClick={() => handleAttach(name)} /></td>}
     </tr>
 }
 

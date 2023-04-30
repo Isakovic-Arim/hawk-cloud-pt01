@@ -31,7 +31,7 @@ function Login() {
 
   const handleLogin = async () => {
     const user = await getUser();
-    router.push(`/${user?.user_metadata.username}`);
+    router.push(`/${user?.id}`);
   }
 
   const handleGitHubLogin = async () => {
@@ -39,7 +39,7 @@ function Login() {
     await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `http://localhost:3000/${user?.user_metadata.username}`
+        redirectTo: `http://localhost:3000/${user?.id}`
       }
     })
   }

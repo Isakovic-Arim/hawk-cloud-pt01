@@ -43,18 +43,20 @@ function Create() {
             }
         });
 
-        const reader = pullImageResponse.body.getReader();
-        let output = '';
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-                break;
-            }
-            output += new TextDecoder().decode(value);
-            // Check if the image has been fully pulled
-            if (output.includes(`"status":"Download complete"`) || output.includes(`"status":"Image is up to date for ${data.image}:${data.tag}"`)) {
-                console.log('Image pulled successfully');
-                break;
+        if (pullImageResponse.body !== null) {
+            const reader = pullImageResponse.body.getReader();
+            let output = '';
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                }
+                output += new TextDecoder().decode(value);
+                // Check if the image has been fully pulled
+                if (output.includes(`"status":"Download complete"`) || output.includes(`"status":"Image is up to date for ${data.image}:${data.tag}"`)) {
+                    console.log('Image pulled successfully');
+                    break;
+                }
             }
         }
 
@@ -97,73 +99,18 @@ function Create() {
                 })
             })
         }, 1000);
-
-        // setTimeout(async () => await fetch(`http://localhost:2375/containers/create?name=${data.name}`, {
-        //     method: 'POST',
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({
-        //         "User": "root",
-        //         "AttachStdin": true,
-        //         "AttachStdout": true,
-        //         "AttachStderr": true,
-        //         "Tty": true,
-        //         "OpenStdin": true,
-        //         "StdinOnce": false,
-        //         "Cmd": [
-        //             "-f",
-        //             "/dev/null"
-        //         ],
-        //         "Entrypoint": "tail",
-        //         "Image": `${data.image}:${data.tag}`,
-        //         "Volumes": {
-        //             "/volumes/data": {}
-        //         },
-        //         "WorkingDir": "/",
-        //         "NetworkDisabled": false,
-        //         "MacAddress": "12:34:56:78:9a:bc",
-        //         "ExposedPorts": {
-        //             "22/tcp": {}
-        //         },
-        //         "HostConfig": {
-        //             "Memory": (data.memory * 1074000000000),
-        //             "Binds": [
-        //                 "/tmp:/tmp"
-        //             ],
-        //             "PortBindings": {
-        //                 "22/tcp": [
-        //                     {
-        //                         "HostPort": "11022"
-        //                     }
-        //                 ]
-        //             },
-        //             "NetworkMode": "bridge",
-        //             "Devices": [],
-        //             "Sysctls": {
-        //                 "net.ipv4.ip_forward": "1"
-        //             },
-        //             "LogConfig": {
-        //                 "Type": "json-file",
-        //                 "Config": {}
-        //             },
-        //             "SecurityOpt": [],
-        //             "StorageOpt": {},
-        //             "CgroupParent": "",
-        //             "VolumeDriver": "",
-        //             "ShmSize": 67108864
-        //         }
-        //     })
-        // }).then(response => response.json())
-        //     .then(data => data.Id), 1000);
     };
 
-    function Option({ name }) {
+    type OptionProps = {
+        name: string
+    }
+
+    const Option: React.FunctionComponent<OptionProps> = ({name}) => {
         return <li>
             <input {...register("image")} type="radio" id={name} value={name} className="hidden peer" />
             <label htmlFor={name} className="inline-flex items-center justify-between w-20 h-20 p-5 bg-gray-800 border rounded-lg cursor-pointer border-gray-700 peer-checked:bg-white hover:bg-gray-700">
                 <div className="block">
-                    <Image priority alt={name} width={200} height={200} src={`/svgs/${name}.svg`} />
+                    <Image priority alt={name} width={200} height={200} src={`/svgs/images/${name}.svg`} />
                 </div>
             </label>
         </li>

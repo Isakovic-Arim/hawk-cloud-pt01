@@ -37,7 +37,7 @@ export default function Register() {
     return (
         <div className='h-screen grid place-items-center'>
             <form className='grid place-items-center' onSubmit={handleSubmit(onSubmit)}>
-                <input className='m-5 p-2 rounded-md' pattern='[a-zA-Z-_\s]+' placeholder="Username" {...register("username", { required: true })} />
+                <input className='m-5 p-2 rounded-md' placeholder="Username" {...register("username", { required: true })} />
                 {errors.username && <span>This field is required</span>}
 
                 <input type={hide ? "password" : "text"} className='m-5 p-2 rounded-md' placeholder="Password" {...register("password", { required: true })} />

@@ -1,8 +1,12 @@
 import { Server } from "socket.io";
 import { createServer } from "http";
 import Docker from "dockerode";
+import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(req, res) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "GET") {
     return res.status(405).end();
   }
@@ -16,36 +20,35 @@ export default async function handler(req, res) {
 
   const docker = new Docker({ host: 'localhost', port: 2375 });
 
-  const container = docker.getContainer('7b022ac831e55d56a7024d1a5989dcfd4e0efc20ccb3662abb9cff5000d50692');
-
   io.on("connection", (socket) => {
     console.log("Client connected");
 
-    const eventsStream = docker.getEvents((err, data) => {
+    docker.getEvents((err, data) => {
       if (err) {
         console.error(err);
         socket.emit("dockerEventError", err.message);
         return;
       }
 
-      data.on("data", (chunk) => {
-        const str = chunk.toString("utf8");
-        const lines = str.trim().split("\n");
-        for (const line of lines) {
-          const evt = JSON.parse(line);
-          socket.emit("dockerEvent", evt);
-        }
-      });
+      if (data) {
+        data.on("data", (chunk) => {
+          const str = chunk.toString("utf8");
+          const lines = str.trim().split("\n");
+          for (const line of lines) {
+            const evt = JSON.parse(line);
+            socket.emit("dockerEvent", evt);
+          }
+        });
 
-      data.on("error", (err) => {
-        console.error(err);
-        socket.emit("dockerEventError", err.message);
-      });
+        data.on("error", (err) => {
+          console.error(err);
+          socket.emit("dockerEventError", err.message);
+        });
+      }
     });
 
     socket.on("disconnect", () => {
       console.log("Client disconnected");
-      eventsStream.destroy();
     });
   });
 
